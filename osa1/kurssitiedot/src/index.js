@@ -1,9 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-
-
-
+import Course from './components.course'
 
 
 const App = () => {
@@ -32,10 +29,7 @@ const App = () => {
   }
   return (
     <div>
-    <Header otsikko={course.name}/>
-    <Content parts={course.parts}/>
-    
-    <Total parts={course.parts}/>
+  <Course course={course} />
     </div>
   )
 }
@@ -87,7 +81,7 @@ return(
 return(
 
 <p> {props.nimi1} {props.tehtävät1}
-{props.nimi2} {props.tehtävät2}
+{props.tehtävät2}
 {props.nimi3} {props.tehtävät3}
 
 </p>
