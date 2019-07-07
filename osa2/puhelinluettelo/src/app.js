@@ -1,12 +1,32 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect } from 'react'
+import './index.css'
+import personService from './services/persons'
+
+
 const App = () => {
   const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040522211' }
+    { name: 'Konsta Heino', number: '040522211' }
   ]) 
   const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber ] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
 
+    useEffect(() => {
+
+        personService
+        .getAll()
+        .then(response => {
+                setPersons(response.data)
+            })
+    }, [])
+
+
+
+  const handleErrorMessage= (uusiviesti) =>{
+    setErrorMessage(uusiviesti)
+
+
+  }
 
 
 
@@ -32,33 +52,89 @@ const App = () => {
 
 
 
-        const temparray = persons.map(name1 => name1.name)
 
-        temparray.find(function(element) {
+        
 
-            if(element===newName){
-            let nimi = newName +' on jo luettelossa'
-                window.alert( nimi);
+const jarppi = () =>{
+
+
+
+
+
+
+
+
+
+
+    const phonebookObject = {
+        name: newName,
+        number: newNumber
+    }
+
+
+
+    personService .create(phonebookObject) .then(response =>
+        {
+            
+            setPersons(persons.concat( response.data))
+            setErrorMessage(`${newName}lisätty` )
+            setNewName('')
+            setNewNumber('')
+           
+       
+       
+       
+       
+       
+        },)
+
+
+
+
+
+
+
+        .catch(error => {
+            console.log('fail')
+        })
+
+return(
+
+    console.log('doned')
+
+)
+
+
+
+
+
+}
+
+
+            if( typeof persons.find(person => person.name===newName)=== 'object' ){
+                console.log('persons find', persons.find(person => person.name===newName))
+
+
+
+
+
+                const viesti =() =>  {
+                    return ( newName +' on jo'
+                    )}
+
+
+                window.alert(viesti());
+
+                console.log(persons.map(name1 => name1.name))
+
 
             }
-            else  {
 
-                const phonebookObject = {
-                    name: newName,
-                    number: newNumber
-                }
-                setPersons(persons.concat( phonebookObject))
-                setNewName('')
+                else{
 
-                setNewNumber('')
-
-
-
+                    jarppi()
+                    
             }
-
-
-        });
-
 
 
 
@@ -75,6 +151,8 @@ const App = () => {
 
     return (
     <div>
+       
+        <Ilmoitus message={errorMessage}/>
       <Otsikko1/>
         <form onSubmit={addName}  >
             <div>
@@ -96,7 +174,7 @@ const App = () => {
      <Otsikko2/>
 
 
- <Persons persons = {persons}/>
+ <Persons persons = {persons} errviesti={handleErrorMessage} setPersons={setPersons} efekti={useEffect} />
 
 
     </div>
@@ -105,12 +183,88 @@ const App = () => {
 }
 
 
-const Persons = ({persons}) =>{
-    console.log(persons.name)
-    const map =  persons.map(person =>{
+const Persons = ({persons, errviesti, setPersons, }) =>{
 
+
+    
+    const map =  persons.map(person =>{
+        const poistetaanks = () => {
+        
+          let varmistus =  window.confirm('poistetaanko nimi?')
+        
+        
+         
+        
+          
+        
+        
+        if (varmistus === true){
+           
+          
+                  
+        
+            return(
+        
+        
+               personService
+               .deleteId(person.id)
+                .then(res => {
+                
+                  console.log(res.data);
+                  errviesti(` ${person.name} poistettu`)
+                  
+                  personService.getAll().then(response => {
+                    setPersons(response.data)
+                })
+                    
+                })
+               
+             
+        
+        
+        
+               
+            
+            
+            )
+        }
+        else{
+        
+        
+            return(
+        
+                window.postMessage('painoit ei')
+        
+            )
+        
+        }
+        
+        
+        }
+        
+        
+        
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+   
+console.log(person.id)
         return(
-            <div>   {person.name} {person.number} <br/>   </div>
+            <div>   {person.name} {person.number}  <button  onClick={poistetaanks} >Delete</button> <br/>   </div>
 
         )
     })
@@ -152,6 +306,37 @@ const Otsikko2 = () =>{
 
 
 }
+
+
+
+
+
+
+            const Ilmoitus = ({ message }) => {
+
+                const staili= {
+color: 'green',
+fontStyle: 'italic',
+fontSize: 40
+
+
+
+                }
+
+                
+
+
+                if (message === null) {
+                  return null
+                }
+              
+                return (
+                  <div className="virheilmoitus" >
+                    {message}
+                  </div>
+                )
+              }
+
 
 
 
